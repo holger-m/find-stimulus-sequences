@@ -1,98 +1,14 @@
-function [s_all] = backtracking_run(file_str)
+function [C_full, C_dyn, s] = backtracking_run(i_root)
 
-C = readmatrix(file_str);
+C_full = readmatrix('pot_next_cond_matlab_readin.xlsx');
 
-[i_max, j_max] = size(C);
-    
-i_curr = 1;
-j_curr = 1;
-j_next = 1;
-j_vec = j_curr;
+C_dyn = C_full;
 
-s = C(i_curr,j_curr);
+s = i_root;
 
-count = 0;
+C_dyn(C_dyn == s) = NaN;
 
-count_limit = 2^24;
+% state: valid sequence s and C_dyn with NaNs
 
-s_all = zeros(i_max, count_limit, 'uint8');
-
-go_on_flag = true;
-
-while go_on_flag
-
-    s = backtracking_rec(C, i_max, j_max, s, i_curr, j_curr, j_next, j_vec);
-    
-    if ~any(isnan(s))
-        
-        count = count + 1;
-        
-        if mod(count, 1e5) == 0
-        
-            disp(' ');
-            disp(num2str(s'));
-            disp(num2str(count));
-        
-        end
-        
-        s_all(:,count) = s;
-        
-        [row,col]  = find(C == repmat(s,1,j_max));
-        
-        [~,sort_index] = sort(row);
-        
-        j_vec = col(sort_index);
-        
-        i_free_ind_vec = find(j_vec < 8);
-        
-        i_free_ind_max = i_free_ind_vec(end,1) - 1;
-        
-        if i_free_ind_max >= 1
-        
-            i_curr = i_free_ind_max;
-
-            j_curr = j_vec(i_curr,1);
-
-            j_next = j_vec(i_curr+1,1) + 1;
-
-            s = s(1:i_curr);
-
-            j_vec = j_vec(1:i_curr);
-        
-        else  % set new root
-            
-            i_curr = 1;
-            
-            j_curr = j_vec(i_curr,1) + 1;
-            
-            j_next = 1;
-            
-            j_vec = j_curr;
-            
-            s = C(i_curr,j_curr);
-            
-        end
-        
-    else
-        
-        disp(' ');
-        disp('search complete!');
-        
-        go_on_flag = false;
-        
-    end
-    
-    if count == count_limit
-        
-        disp(' ');
-        disp('count limit reached!');
-        
-        go_on_flag = false;
-        
-    end
-
-end
-
-
-
+[C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s);
 

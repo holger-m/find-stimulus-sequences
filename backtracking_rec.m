@@ -1,111 +1,47 @@
-function [s] = backtracking_rec(C, i_max, j_max, s, i_curr, j_curr, j_next, j_vec)
+function [C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s)
 
-% s comes in correctly
-% next extension to test is at i_curr+1, j_next (or, if i_curr == i_max, then return)
+if size(s,1) == size(C_full,1)
+    
+    disp('sequence complete');
+    
+    return
+    
+end
 
-verbose_flag = false;
+s_last = s(end,1);
 
-if i_curr < i_max
+subnode_vec = C_dyn(s_last,:);
+
+subnode_vec(:,isnan(subnode_vec)) = [];
+
+if isempty(subnode_vec)   
+
+    s = s(1:end-1);
+    
+    if isempty(s)
         
-    s_ext = [s; C(i_curr + 1, j_next)];
-
-    validity_flag = size(unique(s_ext),1) == i_curr + 1;
-
-    if validity_flag  % successful extension
-
-        s = s_ext;
-
-        i_curr = i_curr + 1;
-
-        j_curr = j_next;
+        disp('search complete, sequence incomplete');
         
-        j_vec = [j_vec; j_next];
-
-        j_next = 1;
+        return;
         
-        if verbose_flag
-        
-            disp(' ');
-            disp(num2str(s'));
-            disp('valid');
-        
-        end
-
-        s = backtracking_rec(C, i_max, j_max, s, i_curr, j_curr, j_next, j_vec);
-
     else
-
-        if j_next < j_max
-
-            j_next = j_next + 1;
-            
-            if verbose_flag
-            
-                disp(' ');
-                disp(num2str(s_ext'));
-                disp('invalid, count j_next up');
-            
-            end
-
-            s = backtracking_rec(C, i_max, j_max, s, i_curr, j_curr, j_next, j_vec);
-
-        else  % continue here with j_vec
-            
-            if all(j_vec == 8*ones(size(j_vec,1),1))   % search complete
-                
-                s = NaN;
-                
-                if verbose_flag
-                
-                    disp(' ');
-                    disp(num2str(s_ext'));
-                    disp('invalid, j_vec all 8');
-                
-                end
-                
-                return;
-                
-            else
-                
-                i_free_ind_vec = find(j_vec < 8);
-                
-                i_free_ind_max = i_free_ind_vec(end,1);
-                
-                i_curr = i_free_ind_max;
-                
-                j_curr = j_vec(i_curr,1) + 1;
-                
-                s = [s(1:i_curr-1); C(i_curr,j_curr)];
-                
-                j_vec = [j_vec(1:i_curr-1); j_curr];
-                
-                j_next = 1;
-                
-                if verbose_flag
-                
-                    disp(' ');
-                    disp(num2str(s_ext'));
-                    disp('invalid, go back');
-                
-                end
-                
-                s = backtracking_rec(C, i_max, j_max, s, i_curr, j_curr, j_next, j_vec);
-                
-            end            
-
-        end
         
+        C_dyn(C_full == s_last) = s_last;
+
+        C_dyn(s(end,1), C_dyn(s(end,1),:) == s_last) = NaN;
+        
+        [C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s);
+    
     end
     
 else
     
-    if verbose_flag
-        
-        disp(' ');
-        disp('all valid');
+    s_ext = subnode_vec(1,1);
     
-    end
+    C_dyn(C_dyn == s_ext) = NaN;
     
-    return;  % Input s already correct
+    s = [s; s_ext];
+    
+    [C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s);
     
 end
