@@ -23,15 +23,41 @@ while cont_flag
         
         s = backtracking_random(C_full_orig);
         
-        count_correct = count_correct + 1;
+        new_flag = true;
         
-        s_mat(:,count_correct) = s;
-        
-        disp(['No. of completed attempts: ',num2str(count_correct), ' of ', num2str(N)]);
-        
-        if count_correct == N
+        if count >= 1
             
-            cont_flag = false;
+            for s_ind = 1:count
+                
+                s_temp = s_mat(:,s_ind);
+                
+                if all(s == s_temp)
+                    
+                    new_flag = false;
+                    
+                end
+                
+            end
+            
+        end
+        
+        if new_flag
+        
+            count_correct = count_correct + 1;
+
+            s_mat(:,count_correct) = s;
+
+            disp(['No. of completed attempts: ',num2str(count_correct), ' of ', num2str(N)]);
+
+            if count_correct == N
+
+                cont_flag = false;
+
+            end
+        
+        else
+            
+            warning('Sequence discarded; double occurance!');
             
         end
         
