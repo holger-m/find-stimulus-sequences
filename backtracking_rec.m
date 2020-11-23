@@ -1,5 +1,8 @@
 function [C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s)
 
+%disp(C_dyn);
+%disp(s);
+
 if size(s,1) == size(C_full,1)
     
     disp('sequence complete');

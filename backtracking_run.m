@@ -13,3 +13,34 @@ C_dyn(C_dyn == s) = NaN;
 
 [C_full, C_dyn, s] = backtracking_rec(C_full, C_dyn, s);
 
+
+%% sanity checks
+
+if size(unique(s),1) ~= size(C_full,1)
+    
+    error('Something has gone horribly wrong!');
+    
+end
+
+if s(1,1) ~= i_root
+    
+    error('Something has gone horribly wrong!');
+    
+end
+
+for i = 2:size(C_full,1)
+    
+    s_last = s(i-1,1);
+    
+    s_curr = s(i,1);
+    
+    subnode_vec = C_full(s_last,:);
+    
+    if all(subnode_vec ~= s_curr)
+        
+        error('Something has gone horribly wrong!');
+    
+    end
+    
+end
+
