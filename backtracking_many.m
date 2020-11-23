@@ -25,9 +25,9 @@ while cont_flag
         
         new_flag = true;
         
-        if count >= 1
+        if count_correct >= 1
             
-            for s_ind = 1:count
+            for s_ind = 1:count_correct
                 
                 s_temp = s_mat(:,s_ind);
                 
